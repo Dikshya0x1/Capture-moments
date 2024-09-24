@@ -3,7 +3,8 @@ $page_title = "Gallery";
 include 'config.php'; 
 include 'templates/header.php'; 
 
-$limit = 9; // Number of images per page for 1024px screens
+// Check if limit is set in the URL, otherwise use default limit
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 8; // Default is 8, 9 for iPads
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $category = isset($_GET['category']) ? $_GET['category'] : '';
 
@@ -27,8 +28,8 @@ $total_pages = ceil($total_images / $limit);
 // Fetch distinct categories for filtering
 $categories_sql = "SELECT DISTINCT category FROM gallery";
 $categories_result = $conn->query($categories_sql);
-
 ?>
+
 
 <section class="gallery">
     <h1>My Photo Gallery</h1>
@@ -126,7 +127,7 @@ $categories_result = $conn->query($categories_sql);
     /* Grid Layout */
     .gallery-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Default for large screens */
         gap: 20px;
     }
 
@@ -176,7 +177,7 @@ $categories_result = $conn->query($categories_sql);
     /* Pagination Styles */
     .pagination {
         margin-top: 15px;
-        margin-bottom: 60px;
+        margin-bottom: 80px;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
@@ -206,11 +207,17 @@ $categories_result = $conn->query($categories_sql);
     /* Responsive Styles */
     @media (max-width: 1024px) {
         .gallery-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(3, 1fr); /* 3 images per row for iPads */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .gallery h1 {
+            font-size: 2rem;
         }
 
-        .category-filter {
-            margin-bottom: 40px;    
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjust for smaller screens */
         }
 
         .category-filter a {
@@ -229,38 +236,13 @@ $categories_result = $conn->query($categories_sql);
         }
     }
 
-    @media (max-width: 768px) {
-        .gallery h1 {
-            font-size: 2rem;
-        }
-
-        .gallery-grid {
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        }
-
-        .category-filter a {
-            margin: 5px;
-            padding: 8px 12px;
-            font-size: 0.9rem;
-        }
-
-        .pagination {
-            margin-bottom: 80px;
-        }
-
-        .pagination a {
-            padding: 5px 10px;
-            font-size: 1rem;
-        }
-    }
-
     @media (max-width: 480px) {
         .gallery h1 {
             font-size: 1.75rem;
         }
 
         .gallery-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr; /* 1 image per row for mobile */
         }
 
         .category-filter a {
@@ -279,3 +261,24 @@ $categories_result = $conn->query($categories_sql);
         }
     }
 </style>
+
+
+<script>
+    // Check screen size and update the limit if it's an iPad-sized screen
+    document.addEventListener("DOMContentLoaded", function() {
+        var screenWidth = window.innerWidth;
+
+        // Check if the screen size is between 768px and 1024px (iPad)
+        if (screenWidth >= 768 && screenWidth <= 1024) {
+            // Append limit=9 to the URL if not already present
+            var url = new URL(window.location.href);
+            var searchParams = new URLSearchParams(url.search);
+            
+            if (!searchParams.has('limit')) {
+                searchParams.set('limit', '9'); // Set the limit to 9 for iPads
+                url.search = searchParams.toString();
+                window.location.href = url.toString(); // Reload the page with the new limit
+            }
+        }
+    });
+</script>
