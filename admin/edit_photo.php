@@ -25,6 +25,7 @@ if (isset($_GET['id'])) {
 if (isset($_POST['update'])) {
     $title = escape($_POST['title']);
     $description = escape($_POST['description']);
+    $category = escape($_POST['category']); // Fetch new category
     $photo_id = escape($_POST['id']);
     
     // Check if a new image has been uploaded
@@ -34,14 +35,14 @@ if (isset($_POST['update'])) {
         
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
             // Update with new image
-            $sql = "UPDATE gallery SET title='$title', description='$description', image_path='$target' WHERE id='$photo_id'";
+            $sql = "UPDATE gallery SET title='$title', description='$description', category='$category', image_path='$target' WHERE id='$photo_id'";
         } else {
             echo "Failed to upload new image.";
             exit();
         }
     } else {
         // Update without changing the image
-        $sql = "UPDATE gallery SET title='$title', description='$description' WHERE id='$photo_id'";
+        $sql = "UPDATE gallery SET title='$title', description='$description', category='$category' WHERE id='$photo_id'";
     }
     
     if ($conn->query($sql) === TRUE) {
@@ -82,7 +83,7 @@ if (isset($_POST['update'])) {
             display: flex;
             flex-direction: column;
         }
-        input[type="text"], textarea, input[type="file"] {
+        input[type="text"], textarea, input[type="file"], select {
             margin-bottom: 20px;
             padding: 10px;
             border-radius: 5px;
@@ -137,9 +138,24 @@ if (isset($_POST['update'])) {
         <input type="hidden" name="id" value="<?php echo $photo['id']; ?>">
         <input type="text" name="title" value="<?php echo $photo['title']; ?>" required>
         <textarea name="description" required><?php echo $photo['description']; ?></textarea>
+        
+        <!-- Display current image -->
         <img src="../<?php echo $photo['image_path']; ?>" alt="Current Image">
+        
         <p>Change Image (optional):</p>
         <input type="file" name="image">
+
+        <!-- Category Dropdown (with pre-selected category) -->
+        <p>Category:</p>
+        <select name="category" required>
+            <option value="Nature" <?php if($photo['category'] == 'Nature') echo 'selected'; ?>>Nature</option>
+            <option value="Wedding" <?php if($photo['category'] == 'Wedding') echo 'selected'; ?>>Wedding</option>
+            <option value="Portraits" <?php if($photo['category'] == 'Portraits') echo 'selected'; ?>>Portraits</option>
+            <option value="Fashion" <?php if($photo['category'] == 'Fashion') echo 'selected'; ?>>Fashion</option>
+            <option value="Events" <?php if($photo['category'] == 'Events') echo 'selected'; ?>>Events</option>
+            <option value="Other" <?php if($photo['category'] == 'Other') echo 'selected'; ?>>Other</option>
+        </select>
+
         <button type="submit" name="update">Update Photo</button>
     </form>
 </div>

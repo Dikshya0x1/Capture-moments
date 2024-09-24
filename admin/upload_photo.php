@@ -9,17 +9,18 @@ include('../config.php');
 if (isset($_POST['upload'])) {
     $title = escape($_POST['title']);
     $description = escape($_POST['description']);
-    
+    $category = escape($_POST['category']); // Fetch category
+
     // File upload
     $image = $_FILES['image']['name'];
     $target = "../images/" . basename($image);
-    
+
     // Check if file was uploaded without errors
     if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
             // Use prepared statement to avoid SQL injection
-            $stmt = $conn->prepare("INSERT INTO gallery (title, description, image_path) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $title, $description, $target);
+            $stmt = $conn->prepare("INSERT INTO gallery (title, description, category, image_path) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("ssss", $title, $description, $category, $target);
 
             if ($stmt->execute()) {
                 header("Location: dashboard.php?success=1");
@@ -43,7 +44,6 @@ if (isset($_POST['upload'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload New Photo</title>
-
     <style>
         /* Basic Reset */
         * {
@@ -81,9 +81,10 @@ if (isset($_POST['upload'])) {
         }
 
         .upload-form input,
-        .upload-form textarea {
+        .upload-form textarea,
+        .upload-form select {
             width: 100%;
-            padding: 20px;
+            padding: 15px;
             margin: 10px 0;
             border-radius: 5px;
             border: 1px solid #ddd;
@@ -125,7 +126,8 @@ if (isset($_POST['upload'])) {
             }
 
             .upload-form input,
-            .upload-form textarea {
+            .upload-form textarea,
+            .upload-form select {
                 font-size: 0.95rem;
             }
 
@@ -141,6 +143,18 @@ if (isset($_POST['upload'])) {
         <h2>Upload New Photo</h2>
         <input type="text" name="title" placeholder="Title" required>
         <textarea name="description" placeholder="Description" required></textarea>
+
+        <!-- Category Dropdown -->
+        <select name="category" required>
+            <option value="" disabled selected>Select Category</option>
+            <option value="Nature">Nature</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Portraits">Portraits</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Events">Events</option>
+            <option value="Other">Other</option>
+        </select>
+
         <input type="file" name="image" required>
         <button type="submit" name="upload">Upload Photo</button>
     </form>
