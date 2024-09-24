@@ -270,14 +270,13 @@ $categories_result = $conn->query($categories_sql);
 
         // Check if the screen size is between 768px and 1024px (iPad)
         if (screenWidth >= 768 && screenWidth <= 1024) {
-            // Append limit=9 to the URL if not already present
             var url = new URL(window.location.href);
             var searchParams = new URLSearchParams(url.search);
             
             if (!searchParams.has('limit')) {
-                searchParams.set('limit', '9'); // Set the limit to 9 for iPads
+                searchParams.set('limit', '9'); 
                 url.search = searchParams.toString();
-                window.location.href = url.toString(); // Reload the page with the new limit
+                window.location.href = url.toString();
             }
         }
     });
