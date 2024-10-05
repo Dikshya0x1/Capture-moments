@@ -2,7 +2,7 @@
 $page_title = "Gallery";
 include 'config.php'; 
 include 'templates/header.php'; 
-
+git commit -m "first commit"
 // Check if limit is set in the URL, otherwise use default limit
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 8; // Default is 8, 9 for iPads
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
