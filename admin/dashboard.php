@@ -4,7 +4,7 @@ if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
     exit();
 }
-include('../config.php');
+include('/config.php');
 ?>
 
 <!DOCTYPE html>
@@ -167,28 +167,37 @@ include('../config.php');
     </div>
 
     <!-- Gallery Management Section -->
-    <section class="admin-gallery">
-        <h2>Manage Gallery</h2>
+<section class="admin-gallery">
+    <h2>Manage Gallery</h2>
 
-        <div class="gallery-grid">
-            <?php
-            $sql = "SELECT * FROM gallery ORDER BY created_at DESC";
-            $result = $conn->query($sql);
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<div class='admin-item'>";
-                    echo "<img src='../images/" . $row['image_path'] . "' alt='" . $row['title'] . "'>";
-                    echo "<h3>" . $row['title'] . "</h3>";
-                    echo "<a href='edit_photo.php?id=" . $row['id'] . "' class='edit-btn'>Edit</a>";
-                    echo "<a href='delete_photo.php?id=" . $row['id'] . "' class='delete-btn' onclick=\"return confirm('Are you sure you want to delete this photo?');\">Delete</a>";
-                    echo "</div>";
-                }
-            } else {
-                echo "<p>No photos available.</p>";
+    <div class="gallery-grid">
+        <?php
+        // Include the database connection
+        include('./config.php');
+
+        // Fetch gallery items ordered by id (or another column)
+        $sql = "SELECT * FROM gallery ORDER BY id DESC"; // Using 'id' for ordering
+        $result = $conn->query($sql);
+
+        // Check if there are any results
+        if ($result->num_rows > 0) {
+            // Loop through each row and display the gallery item
+            while ($row = $result->fetch_assoc()) {
+                echo "<div class='admin-item'>";
+                echo "<img src='../images/" . $row['image_path'] . "' alt='" . $row['title'] . "'>";
+                echo "<h3>" . $row['title'] . "</h3>";
+                echo "<a href='edit_photo.php?id=" . $row['id'] . "' class='edit-btn'>Edit</a>";
+                echo "<a href='delete_photo.php?id=" . $row['id'] . "' class='delete-btn' onclick=\"return confirm('Are you sure you want to delete this photo?');\">Delete</a>";
+                echo "</div>";
             }
-            ?>
-        </div>
-    </section>
+        } else {
+            // No photos available message
+            echo "<p>No photos available.</p>";
+        }
+        ?>
+    </div>
+</section>
+
 
 </body>
 </html>
